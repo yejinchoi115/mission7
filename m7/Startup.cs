@@ -33,6 +33,12 @@ namespace m7
             });
             services.AddScoped<IBookstoreRepository, EFBookstoreRepository>();
 
+            //for razor page
+            services.AddRazorPages();
+
+            //for session 
+            services.AddDistributedMemoryCache();
+            services.AddSession();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -51,6 +57,8 @@ namespace m7
             app.UseHttpsRedirection();
             app.UseStaticFiles();
 
+            app.UseSession();
+
             app.UseRouting();
 
             app.UseAuthorization();
@@ -58,8 +66,29 @@ namespace m7
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllerRoute(
+                    name: "categorypage",
+                    pattern: "{categoryType}/Page{pageNum}",
+                    defaults: new { Controller = "Home", action = "Index" }
+                    );
+
+                endpoints.MapControllerRoute(
+                   name: "Paging",
+                   pattern: "Page{pageNum}",
+                   defaults: new { Controller = "Home", action = "Index", pageNum = 1 }
+                   );
+
+                endpoints.MapControllerRoute(
+                    name: "category",
+                    pattern: "{categoryType}",
+                    defaults: new { Controller = "Home", action = "Index", pageNum = 1 }
+                    );
+
+                endpoints.MapControllerRoute(
                     name: "default",
-                    pattern: "{controller=Home}/{action=Index}/{id?}");
+                    pattern: "{controller=Home}/{action=Index}/{id?}"
+                    );
+
+                endpoints.MapRazorPages();
             });
         }
     }
